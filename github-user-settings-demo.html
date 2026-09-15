@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Saved User Settings Demo</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #111a2c;
+      --panel2: #172238;
+      --text: #eef4ff;
+      --muted: #9eb0cc;
+      --accent: #5ea1ff;
+      --border: #2a3954;
+      --success: #4fd39a;
+      --danger: #ff6d7a;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(135deg, #07101d, #101c30);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .wrap {
+      width: min(900px, 100%);
+      margin: 0 auto;
+    }
+
+    .card {
+      background: rgba(17, 26, 44, 0.96);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 0 18px 50px rgba(0,0,0,.28);
+      margin-bottom: 18px;
+    }
+
+    h1, h2 {
+      margin-top: 0;
+    }
+
+    p {
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 7px;
+      color: #dbe6f8;
+      font-weight: 700;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 12px 13px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #0d1626;
+      color: var(--text);
+      outline: none;
+      font-size: 15px;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--accent);
+    }
+
+    button {
+      appearance: none;
+      border: 0;
+      border-radius: 10px;
+      padding: 11px 16px;
+      font-weight: 800;
+      cursor: pointer;
+      background: var(--accent);
+      color: #07101d;
+      font-size: 14px;
+    }
+
+    button.secondary {
+      background: #253652;
+      color: var(--text);
+    }
+
+    button.danger {
+      background: #54212c;
+      color: #ffb8c0;
+    }
+
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .message {
+      min-height: 22px;
+      margin-top: 12px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .success { color: var(--success); }
+    .error { color: var(--danger); }
+
+    .hidden { display: none !important; }
+
+    .setting {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: center;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .setting:last-child {
+      border-bottom: 0;
+    }
+
+    .setting-title {
+      font-weight: 800;
+      margin-bottom: 5px;
+    }
+
+    .setting-desc {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .switch {
+      position: relative;
+      width: 54px;
+      height: 30px;
+      flex: 0 0 auto;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      inset: 0;
+      background: #3a4760;
+      border-radius: 999px;
+      transition: .2s;
+    }
+
+    .slider:before {
+      content: "";
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      left: 4px;
+      top: 4px;
+      background: white;
+      border-radius: 50%;
+      transition: .2s;
+    }
+
+    .switch input:checked + .slider {
+      background: var(--accent);
+    }
+
+    .switch input:checked + .slider:before {
+      transform: translateX(24px);
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .badge {
+      background: #182842;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 7px 11px;
+      color: #caddf8;
+      font-size: 13px;
+    }
+
+    .save-status {
+      font-size: 13px;
+      color: var(--success);
+      margin-left: 8px;
+    }
+
+    .small {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    @media (max-width: 650px) {
+      body { padding: 12px; }
+      .row { grid-template-columns: 1fr; }
+      .topbar { align-items: flex-start; flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <!-- LOGIN / SIGNUP -->
+    <section class="card" id="authCard">
+      <h1>User Login Demo</h1>
+      <p>
+        Create a test account, choose some settings, refresh the page, log out,
+        or create another account. Each username gets its own saved choices.
+      </p>
+
+      <div class="row">
+        <div>
+          <label for="username">Username</label>
+          <input id="username" autocomplete="username" placeholder="Example: mason" />
+        </div>
+        <div>
+          <label for="password">Password</label>
+          <input id="password" type="password" autocomplete="current-password" placeholder="Test password" />
+        </div>
+      </div>
+
+      <div class="buttons">
+        <button id="loginBtn">Log In</button>
+        <button id="signupBtn" class="secondary">Create Account</button>
+      </div>
+
+      <div class="message" id="authMessage"></div>
+
+      <p class="small">
+        Demo only: usernames and passwords are stored in this browser's localStorage.
+        Do not use real passwords. A production version would use Supabase, Firebase,
+        Auth0, etc.
+      </p>
+    </section>
+
+    <!-- USER SETTINGS -->
+    <section id="app" class="hidden">
+      <div class="card">
+        <div class="topbar">
+          <div>
+            <h1 style="margin-bottom:6px;">My Settings</h1>
+            <div class="badge">Signed in as <strong id="currentUser"></strong></div>
+          </div>
+          <div class="buttons" style="margin-top:0;">
+            <button id="logoutBtn" class="secondary">Log Out</button>
+          </div>
+        </div>
+
+        <p>
+          Change any option below. Your selections save automatically to your account.
+          <span id="saveStatus" class="save-status"></span>
+        </p>
+      </div>
+
+      <div class="card">
+        <h2>Example Options</h2>
+
+        <div class="setting">
+          <div>
+            <div class="setting-title">Dark Mode Preference</div>
+            <div class="setting-desc">Example yes/no option.</div>
+          </div>
+          <label class="switch">
+            <input id="darkMode" type="checkbox" />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="setting">
+          <div>
+            <div class="setting-title">Email Notifications</div>
+            <div class="setting-desc">Another toggle saved for this user.</div>
+          </div>
+          <label class="switch">
+            <input id="notifications" type="checkbox" />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div style="margin-top:20px;">
+          <label for="favoriteCategory">Favorite Category</label>
+          <select id="favoriteCategory">
+            <option value="movies">Movies</option>
+            <option value="games">Games</option>
+            <option value="collectibles">Collectibles</option>
+            <option value="tools">Tools</option>
+          </select>
+        </div>
+
+        <div style="margin-top:20px;">
+          <label for="resultsPerPage">Results Per Page</label>
+          <select id="resultsPerPage">
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+
+        <div style="margin-top:20px;">
+          <label for="displayName">Display Name</label>
+          <input id="displayName" placeholder="Type anything here" />
+        </div>
+
+        <div style="margin-top:20px;">
+          <label for="notes">Saved Notes</label>
+          <textarea id="notes" rows="5" placeholder="These notes will still be here after refresh..."></textarea>
+        </div>
+
+        <div class="buttons">
+          <button id="resetSettingsBtn" class="danger">Reset My Settings</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>How to Test It</h2>
+        <p>
+          Make some changes, then refresh the browser. Your choices should remain.
+          Next, log out and create another username. That second user will get a
+          separate set of settings. Log back into the first account and its old
+          choices will return.
+        </p>
+      </div>
+    </section>
+  </div>
+
+<script>
+  // ==========================================================
+  // DEMO USER SYSTEM
+  // This is intentionally browser-only for easy GitHub testing.
+  // It is NOT secure authentication for a real public website.
+  // ==========================================================
+
+  const USERS_KEY = "github_demo_users_v1";
+  const CURRENT_USER_KEY = "github_demo_current_user_v1";
+
+  const authCard = document.getElementById("authCard");
+  const app = document.getElementById("app");
+  const usernameInput = document.getElementById("username");
+  const passwordInput = document.getElementById("password");
+  const authMessage = document.getElementById("authMessage");
+  const currentUserLabel = document.getElementById("currentUser");
+  const saveStatus = document.getElementById("saveStatus");
+
+  const settingsControls = {
+    darkMode: document.getElementById("darkMode"),
+    notifications: document.getElementById("notifications"),
+    favoriteCategory: document.getElementById("favoriteCategory"),
+    resultsPerPage: document.getElementById("resultsPerPage"),
+    displayName: document.getElementById("displayName"),
+    notes: document.getElementById("notes")
+  };
+
+  const defaultSettings = {
+    darkMode: true,
+    notifications: false,
+    favoriteCategory: "movies",
+    resultsPerPage: "25",
+    displayName: "",
+    notes: ""
+  };
+
+  function getUsers() {
+    try {
+      return JSON.parse(localStorage.getItem(USERS_KEY)) || {};
+    } catch {
+      return {};
+    }
+  }
+
+  function saveUsers(users) {
+    localStorage.setItem(USERS_KEY, JSON.stringify(users));
+  }
+
+  function normalizeUsername(name) {
+    return name.trim().toLowerCase();
+  }
+
+  function showMessage(text, type = "") {
+    authMessage.textContent = text;
+    authMessage.className = "message " + type;
+  }
+
+  function signup() {
+    const username = normalizeUsername(usernameInput.value);
+    const password = passwordInput.value;
+
+    if (username.length < 3) {
+      showMessage("Username must be at least 3 characters.", "error");
+      return;
+    }
+
+    if (password.length < 4) {
+      showMessage("Password must be at least 4 characters for this demo.", "error");
+      return;
+    }
+
+    const users = getUsers();
+
+    if (users[username]) {
+      showMessage("That username already exists. Try logging in.", "error");
+      return;
+    }
+
+    users[username] = {
+      password: password,
+      settings: { ...defaultSettings }
+    };
+
+    saveUsers(users);
+    localStorage.setItem(CURRENT_USER_KEY, username);
+    showMessage("Account created.", "success");
+    openApp(username);
+  }
+
+  function login() {
+    const username = normalizeUsername(usernameInput.value);
+    const password = passwordInput.value;
+    const users = getUsers();
+
+    if (!users[username] || users[username].password !== password) {
+      showMessage("Incorrect username or password.", "error");
+      return;
+    }
+
+    localStorage.setItem(CURRENT_USER_KEY, username);
+    showMessage("");
+    openApp(username);
+  }
+
+  function logout() {
+    localStorage.removeItem(CURRENT_USER_KEY);
+    app.classList.add("hidden");
+    authCard.classList.remove("hidden");
+    passwordInput.value = "";
+    showMessage("Logged out.", "success");
+  }
+
+  function getCurrentUsername() {
+    return localStorage.getItem(CURRENT_USER_KEY);
+  }
+
+  function openApp(username) {
+    const users = getUsers();
+
+    if (!users[username]) {
+      logout();
+      return;
+    }
+
+    authCard.classList.add("hidden");
+    app.classList.remove("hidden");
+    currentUserLabel.textContent = username;
+    loadSettings();
+  }
+
+  function loadSettings() {
+    const username = getCurrentUsername();
+    const users = getUsers();
+    const settings = {
+      ...defaultSettings,
+      ...(users[username]?.settings || {})
+    };
+
+    settingsControls.darkMode.checked = !!settings.darkMode;
+    settingsControls.notifications.checked = !!settings.notifications;
+    settingsControls.favoriteCategory.value = settings.favoriteCategory;
+    settingsControls.resultsPerPage.value = settings.resultsPerPage;
+    settingsControls.displayName.value = settings.displayName;
+    settingsControls.notes.value = settings.notes;
+  }
+
+  let saveTimer;
+
+  function saveSettings() {
+    const username = getCurrentUsername();
+    if (!username) return;
+
+    const users = getUsers();
+    if (!users[username]) return;
+
+    users[username].settings = {
+      darkMode: settingsControls.darkMode.checked,
+      notifications: settingsControls.notifications.checked,
+      favoriteCategory: settingsControls.favoriteCategory.value,
+      resultsPerPage: settingsControls.resultsPerPage.value,
+      displayName: settingsControls.displayName.value,
+      notes: settingsControls.notes.value
+    };
+
+    saveUsers(users);
+
+    clearTimeout(saveTimer);
+    saveStatus.textContent = "Saved ✓";
+    saveTimer = setTimeout(() => {
+      saveStatus.textContent = "";
+    }, 1200);
+  }
+
+  function resetSettings() {
+    const username = getCurrentUsername();
+    if (!username) return;
+
+    const users = getUsers();
+    users[username].settings = { ...defaultSettings };
+    saveUsers(users);
+    loadSettings();
+
+    saveStatus.textContent = "Settings reset ✓";
+    setTimeout(() => saveStatus.textContent = "", 1500);
+  }
+
+  document.getElementById("signupBtn").addEventListener("click", signup);
+  document.getElementById("loginBtn").addEventListener("click", login);
+  document.getElementById("logoutBtn").addEventListener("click", logout);
+  document.getElementById("resetSettingsBtn").addEventListener("click", resetSettings);
+
+  Object.values(settingsControls).forEach(control => {
+    control.addEventListener("change", saveSettings);
+    control.addEventListener("input", saveSettings);
+  });
+
+  passwordInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") login();
+  });
+
+  // Automatically restore the logged-in user after refresh.
+  const existingUser = getCurrentUsername();
+  if (existingUser && getUsers()[existingUser]) {
+    openApp(existingUser);
+  }
+</script>
+</body>
+</html>
